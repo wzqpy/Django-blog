@@ -1,0 +1,107 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <link rel="stylesheet" href="/static/bs/css/bootstrap.css">
+
+</head>
+<style type="text/css">
+    .img-center {
+        width: 100%;
+        height: 500px;
+
+        position: absolute;
+    }
+
+    .login_from {
+        float: right;
+        margin-top: 50px;
+        margin-right: 180px;
+        padding-top: 100px;
+        padding-bottom: 100px;
+        background-color: #f5f5f5;
+    }
+</style>
+
+
+<body>
+<div class="row top-content">
+    <div class="container">
+        <div class="page-header">
+            <h3><a href=""><img class="img-logo" src="{% static "img/top-logo.png" %}" style="width: 80px;height: 70px"
+                                alt="图标">欢迎来到博客园</a></h3>
+        </div>
+    </div>
+    <img class="img-center " src="{% static "img/login.jpg" %}" alt="背景">
+    <div class="col-md-4"></div>
+    <div class="col-md-4 login_from">
+        <form>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">用户名</label>
+                <input type="text" class="form-control" id="name" placeholder="name">
+            </div>
+            <div class="form-group">
+                <label for="pwd">密码</label>
+                <input type="password" class="form-control" id="pwd" placeholder="Password">
+            </div>
+
+            {#            <div class="form-group">#}
+            {#                <label for="code">验证码</label> <label for="code_str" class="pull-right" style="font-size: 16px;color: red">{{ code }}</label>#}
+            {#                <input type="text" class="form-control" id="code" placeholder="Verification code">#}
+            {#            </div>#}
+
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox"> Check me out
+                </label>
+            </div>
+            {#            <button type="submit" class="btn btn-default pull-right login_btn">登录</button>#}
+        </form>
+
+        <span class="errors"></span>
+        <button class="btn btn-default pull-right login_btn">登录</button>
+    </div>
+    <div class="col-md-4"></div>
+</div>
+</body>
+
+
+<script src="/static/js/jquery-3.2.1.min.js"></script>
+<script>
+    $('.login_btn').click(function () {
+
+        $.ajax({
+            url: "",
+            type: "post",
+            data: {
+                user: $('#name').val(),
+                pwd: $('#pwd').val(),
+
+                csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val(),
+                {#csrf固定写法    #}
+            },
+            success: function (data) {
+                console.log(data);
+                console.log(111);
+                 location.href = '/index/'
+
+                if (data.user){
+                    console.log(data.user)
+                    location.href = '/index/'
+                }
+
+
+
+            }
+
+
+        })
+
+    })
+</script>
+
+</html>
