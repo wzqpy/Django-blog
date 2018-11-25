@@ -111,11 +111,11 @@
 <script src="/static/js/jquery-3.2.1.min.js"></script>
 <script>
 
-    {#    图片#}
+   <!-- 图片读取,change当改变的时候才运行  -->
     $('#avatar').change(function () {
-
+         <!-- 获取标签  -->
         var file_obj = $(this)[0].files[0];
-
+         <!-- 预览显示，改变src  -->
         var reader = new FileReader();
         reader.readAsDataURL(file_obj)
         reader.onload = function () {
@@ -130,16 +130,16 @@
     $('.reg_btn').click(function () {
 
         var formadata = new FormData();
-
+        <!-- 读取forms里面一系列的值  -->
         console.log($('#form').serializeArray())
 
         var request_data = $('#form').serializeArray()
+        console.log(request_data)
 
         $.each(request_data, function (index, data) {
             formadata.append(data.name, data.value)
 
         });
-
         formadata.append('avatar', $('#avatar')[0].files[0]);
 
         $.ajax({

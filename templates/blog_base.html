@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blog</title>
+
+    <link rel="stylesheet" href="/static/bs/css/bootstrap.css">
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <script src="/static/bs/js/bootstrap.min.js"></script>
+
+</head>
+
+<style type="text/css">
+    .title{
+        height: 60px;
+        background-color: #2aabd2;
+    }
+    .top-title{
+        font-size: 40px;
+        margin-top: 40px;
+        margin-left: 20px;
+    }
+    .backend{
+        margin-right: 100px;
+        margin-top: 20px;
+        font-size: 24px;
+    }
+
+</style>
+<body>
+
+<div class="header">
+    <div class="content">
+        <p class="title">
+            <span class="top-title">{{ blog.title }}的博客</span>
+            <a href="/cn_backend/" class="backend pull-right">个人管理</a>
+        </p>
+    </div>
+</div>
+
+<div class="col-md-4">
+    {% block left-content %}
+
+    {% endblock %}
+
+</div>
+<div class="col-md-6">
+    {% block right-content %}
+    {% endblock %}
+</div>
+
+
+</body>
+</html>

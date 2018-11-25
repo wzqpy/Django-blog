@@ -15,7 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,re_path
-
+from BBS import  settings
+from django.views.static import serve
 from blog import views
 
 
@@ -24,6 +25,18 @@ urlpatterns = [
     path('index/', views.index),
     path('login/', views.login),
     path('register/', views.register),
+    path('logout/', views.logout),
 
+    # media配置:
+    re_path(r"media/(?P<path>.*)$",serve,{"document_root":settings.MEDIA_ROOT}),
+
+    # 个人站点的跳转
+    #
+    # ^匹配字符串的开头 $匹配字符串的末尾。  小写w 匹配数字字母下划线， + （重复 >=1 次） {a+b,（abbb)}）,*匹配0个或多个的表达式。
+    re_path('^(?P<username>\w+)/(?P<condition>tag|category|archive)/(?P<param>.*)/$', views.home_site),
+    # home_site(reqeust,username="yuan",condition="tag",param="python")
+
+    # 个人站点url
+    re_path('^(?P<username>\w+)/$', views.home_site),  # home_site(reqeust,username="yuan")
 
 ]

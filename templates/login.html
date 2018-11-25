@@ -82,18 +82,17 @@
                 pwd: $('#pwd').val(),
 
                 csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val(),
-                {#csrf固定写法    #}
+                <!-- csrf固定写法  -->
+
             },
             success: function (data) {
                 console.log(data);
                 console.log(111);
-                 location.href = '/index/'
-
-                if (data.user){
-                    console.log(data.user)
-                    location.href = '/index/'
-                }
-
+                location.href = '/index/'
+                //这里有点问题
+                {#if (data.user){#}
+                {#    console.log(data.user)#}
+                {#    location.href = '/index/'#}
 
 
             }

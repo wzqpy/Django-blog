@@ -38,6 +38,7 @@ python manage.py migrate
 （报错：最后,发现在settings.py 文件加上下面一句话就可以了
 AUTH_USER_MODEL = 'user.ExtendUser' #user是app名字,ExtendUser是类名 覆盖django的user表。）
 
+（UserInfo表继承authenticate(username,password)函数需要两个参数username，password，它自带2个参数验证）
 
 注意在hmtl中<form>
   需要添加{% csrf_token %}
@@ -51,7 +52,7 @@ python manage.py createsuperuser  创建超级用户  进行登录测试
 register视图   基于forms的循环渲染表单，注意添加label标签
 
 
-创建enter_code.py 用于登录验证  
+创建enter_code.py 用于登录验证 （验证码或者验证图片） 
 
 生成一个django 图片类型用html 用seesion动态储存字符 
 
@@ -66,12 +67,51 @@ STATIC_DIR =   (
 html 开头需要添加 {% load staticfiles %}
 图片填写格式例如：  <img class="img-logo" src="{% static "img/top-logo.png" %}
 
-
+lable标签 和 input 的id相同时，是点击关联的。
 
 
 基于ajax 的用户验证 
 *button按钮不能放在form表单里面，button不需要type类型，
+提交 表单 
+print(form.cleaned_data）  获取 符合规则的数据
+print(form.errors)  获取 错误的输入数据
 
+
+ajax ERR_CONNECTION_REFUSED  报这个错误的时候，说明调试提交数据是，端口已经被占用，重新启动就可以了
+
+用admin 后台管理需要  把表注册一下
+
+
+首页渲染文件或者渲染用户头像（拿上传到服务器的文件） 需要在setting 里面配置 
+MEDIA_ROOT=os.path.join(BASE_DIR,"media")
+MEDIA_URL="/media/"
+
+然后在url下面配置
+re_path(r"media/(?P<path>.*)$",serve,{"document_root":settings.MEDIA_ROOT}),
+
+
+在配置里面修改时间
+TIME_ZONE = 'Asia/Shanghai'    （UTC 没有'Asia/Beijing' ）
+
+
+注意：在编辑html时，检查导入js和boostorp没有
+
+
+if request.user.is_authenticated():
+    # 做一些事情针对验证用户.
+else:
+    # 做一些事情对于匿名未登录用户.
+
+
+def logout(request):
+    """
+    注销视图 自带的auth组件判断
+    :param request:
+    :return:
+    """
+    auth.logout(request)  # request.session.flush()--冲洗
+    #logout不需要配置视图
+    return redirect("/login/")
 
 
 
