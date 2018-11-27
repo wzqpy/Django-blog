@@ -5,7 +5,7 @@ from blog.Myforms import UserForm
 from blog.models import UserInfo
 import json
 from blog import models
-from django.db.models import Count
+from django.db.models import Count, F
 
 
 # Create your views here.
@@ -114,7 +114,7 @@ def home_site(requset, username, **kwargs):
     user = UserInfo.objects.filter(username=username).first()
     # 判断用户是否存在!,返回错误页面，或者渲染个人站点
     if not user:
-        return render(requset, "errorPage.html.html")
+        return render(requset, "errorPage.html")
 
     # user 与blog是外键关联
     blog = user.blog
@@ -122,9 +122,9 @@ def home_site(requset, username, **kwargs):
     # 文章分类 对应筛选出2个值
     cate_list = models.Category.objects.filter(blog=blog).values("pk").annotate(c=Count("article__title")).values_list(
         "title", "c")
-    #标签分类 对应筛选出2个值
+    # 标签分类 对应筛选出2个值
     tag_list = models.Tag.objects.filter(blog=blog).values("pk").annotate(c=Count("article")).values_list("title", "c")
-    #时间分类 对应筛选出2个值
+    # 时间分类 对应筛选出2个值
     date_list = models.Article.objects.filter(user=user).extra(
         select={"y_m_date": "date_format(create_time,'%%Y/%%m')"}).values("y_m_date").annotate(
         c=Count("nid")).values_list("y_m_date", "c")
@@ -145,7 +145,7 @@ def home_site(requset, username, **kwargs):
             article_list = article_list.filter(tags__title=param)
         else:
             year, month = param.split("/")  # 分隔    时间分类
-            print(year,month)
+            print(year, month)
             #  需要在setting里面设置  时区改为   USE_TZ = False
             article_list = article_list.filter(create_time__year=year, create_time__month=month)
             print(article_list)
@@ -154,3 +154,123 @@ def home_site(requset, username, **kwargs):
     return render(requset, "blog_site.html",
                   {"username": username, "blog": blog, "article_list": article_list, 'user': user,
                    "cate_list": cate_list, "date_list": date_list, "tag_list": tag_list})
+
+
+def article(requset, username, article_id):
+    '''
+     文章详细内容渲染
+    :param requset:
+    :param username:
+    :param article_id:
+    :return:
+    '''
+
+    user = UserInfo.objects.filter(username=username).first()
+    print(1, requset, 2, username, 3, article_id)
+
+    if not user:
+        return render(requset, "errorPage.html")
+
+    blog = user.blog
+
+    # 文章分类 对应筛选出2个值
+    cate_list = models.Category.objects.filter(blog=blog).values("pk").annotate(c=Count("article__title")).values_list(
+        "title", "c")
+    # 标签分类 对应筛选出2个值
+    tag_list = models.Tag.objects.filter(blog=blog).values("pk").annotate(c=Count("article")).values_list("title", "c")
+    # 时间分类 对应筛选出2个值
+    date_list = models.Article.objects.filter(user=user).extra(
+        select={"y_m_date": "date_format(create_time,'%%Y/%%m')"}).values("y_m_date").annotate(
+        c=Count("nid")).values_list("y_m_date", "c")
+
+    article_obj = models.Article.objects.filter(pk=article_id).first()
+
+    comment_list = models.Comment.objects.filter(article_id=article_id)
+
+    return render(requset, 'blog_airticle.html', locals())
+
+
+def artlike(request):
+    '''
+    文章点赞功能
+    :param request:
+    :return:
+    '''
+
+    print(request.POST)
+
+    article_id = request.POST.get("article_id")
+    is_up = json.loads(request.POST.get("is_up"))  # 需要用json转换成可识别的Ture or False 数据
+
+    print('article_id:', article_id, 'is_up:', is_up)
+
+    # 点赞人即当前登录人
+    # 上面登录 已经 注册过了
+    # 必须通过认证之后才能login(request, user) 这样才能保存会话到request中，
+    user_id = request.user.pk
+    print('user_id:', user_id)
+
+    # 如果没登录，跳转登录页面
+    # 有点问题
+    if not user_id:
+        return render(request, "login.html")
+
+    # 查询当前用户对此篇文章进行过 down or up 没有
+    obj = models.ArticleUpDown.objects.filter(user_id=user_id, article_id=article_id).first()
+
+    response = {"state": True}
+    if not obj:  # 数据为空，生成数据
+        ard = models.ArticleUpDown.objects.create(user_id=user_id, article_id=article_id, is_up=is_up)
+
+        queryset = models.Article.objects.filter(pk=article_id)
+
+        if is_up:
+            queryset.update(down_count=F("up_count") + 1)
+        else:
+            queryset.update(up_count=F("down_count") + 1)
+    else:
+        response["state"] = False
+        response["handled"] = obj.is_up  # 当前用户对文章 点赞 或 踩过 的记录操作
+        print(response)
+
+    return JsonResponse(response)
+
+
+def comment(request):
+    '''
+    文章评论功能
+    :param request:
+    :return:
+    '''
+
+    print(request.POST)
+
+    article_id = request.POST.get("article_id")
+    content = request.POST.get("content")
+    pid = request.POST.get('pid')
+
+    print('article_id:',article_id,'content:',content,'pid:',pid,)
+
+    user_id = request.user.pk
+
+    print('user_id:', user_id)
+
+    # 如果没登录，跳转登录页面
+    # 有点问题
+    if not user_id:
+        return render(request, "login.html")
+
+    # 添加一个评论
+    comment_obj = models.Comment.objects.create(user_id=user_id, article_id=article_id, content=content,
+                                                parent_comment_id=pid)
+
+    # 更新评论数
+    models.Article.objects.filter(pk=article_id).update(comment_count=F("comment_count") + 1)
+
+    response = {}
+
+    response["create_time"] = comment_obj.create_time.strftime("%Y-%m-%d %X")
+    response["username"] = request.user.username
+    response["content"] = content
+
+    return JsonResponse(response)
