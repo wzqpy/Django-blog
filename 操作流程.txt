@@ -113,6 +113,33 @@ def logout(request):
     #logout不需要配置视图
     return redirect("/login/")
 
+url配置 
+
+# ^匹配字符串的开头 $匹配字符串的末尾。  小写w 匹配数字字母下划线， + （重复 >=1 次） {a+b,（abbb)}）,*匹配0个或多个的表达式。
+有名分组  ： 命名正则表达式组的语法是(?P<name>pattern)
+命名空间（英语：Namespace）  多功能项目下运用
+
+
+views  设置
+响应对象主要有三种形式：
+HttpResponse()
+render()
+redirect()
+
+html 解耦 模板  
+{% block 名称id %}
+{% endblock %}
+
+继承模板
+{% extends '模板名称' %}
+
+当需要进行  orm 时间筛选是  
+ #  需要在setting里面设置  时区改为   USE_TZ = False
+
+复用区域的文章继承
+需要创建py文件包  固定名字 （模板标签）
+
+
 
 
 
