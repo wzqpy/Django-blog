@@ -140,6 +140,36 @@ html 解耦 模板
 需要创建py文件包  固定名字 （模板标签）
 
 
+orm 查询
+    聚合查询
+        aggregate   
+        from django.db.models import Avg
+        Book.objects.all().aggregate(Avg('price'))
+
+    分组查询
+        annotate
+        extendsmp.objects.values("dep").annotate(c=Count("id")
+    F查询
+        F() 的实例可以在查询中引用字段，来比较同一个 model 实例中两个不同字段的值。
+        Book.objects.filter(commnetNum__lt=F('keepNum'))
+        Book.objects.all().update(price=F("price")+30)　
+
+    Q查询
+        Q 对象可以使用& 和| 操作符组合起来。当一个操作符在两个Q 对象上使用时，它产生一个新的Q 对象。 
+        bookList=Book.objects.filter(Q(authors__name="yuan")|Q(authors__name="egon"))
+
+js
+    {#三元运算符   条件 ? 结果1 : 结果2;#}
+
+
+需要安装 from bs4 import BeautifulSoup
+pip3 install beautifulsoup4  
+pip3 install bs4
+
+
+下载使用文本编辑器 
+https://github.com/kindsoft/kindeditor
+
 
 
 
