@@ -1,0 +1,111 @@
+{% extends 'backend/backend_base.html' %}
+
+
+
+
+{% block left-content %}
+
+
+    <div class="panel panel-info">
+        <div class="panel-heading">功能</div>
+        <div class="panel-body">
+            <p><a href="/backend_add/">添加文章</a></p>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+
+
+{% block right-content %}
+    <div>
+        <table class="table table-striped table table-hover">
+            <h4>查询结果</h4>
+            {% csrf_token %}
+            {#表头#}
+            <thread>
+                <tr>
+                    <th>序号</th>
+                    <th>titile</th>
+                    <th>发表时间</th>
+                    <th>评论数</th>
+                    <th>点赞</th>
+                    <th>被踩</th>
+                    <th>
+                        选项
+                    </th>
+                </tr>
+            </thread>
+            {#表身#}
+            <tbody>
+            {% for item in article_list %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ item.title }}</td>
+                    <td>{{ item.create_time|date:'Y-m-d' }}</td>
+                    <td>{{ item.comment_count }}</td>
+                    <td>{{ item.up_count }}</td>
+                    <td>{{ item.down_count }}</td>
+                    <td>
+                        <button class="btn btn_edit" article_id= {{ item.nid }}>Edit</button>
+                        <button class="btn btn_delete" article_id= {{ item.nid }}>Delete</button>
+
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+    <script>
+
+        //文章编辑
+        $('.btn_edit').click(function () {
+            //获取对应的文章pk
+            var nid = $(this).attr("article_id")
+            console.log('编辑',nid)
+            $.ajax({
+                url: '',
+                type: 'post',
+                data: {
+                    "csrfmiddlewaretoken": $("[name='csrfmiddlewaretoken']").val(),
+                    'command': 'edit',
+                    nid: nid,
+                },
+                success: function (data) {
+                    console.log(data)
+                }
+            })
+
+        })
+
+
+        //文章删除
+        $('.btn_delete').click(function () {
+            var nid = $(this).attr("article_id")
+            console.log('删除',nid)
+
+            $.ajax({
+                url: '',
+                type: 'post',
+                data: {
+                    "csrfmiddlewaretoken": $("[name='csrfmiddlewaretoken']").val(),
+                    'command': 'delete',
+                    nid: nid,
+                },
+                success: function (data) {
+                    console.log(data)
+                }
+            })
+
+        })
+
+
+    </script>
+
+
+
+
+{% endblock %}

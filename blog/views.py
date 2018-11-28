@@ -6,6 +6,10 @@ from blog.models import UserInfo
 import json
 from blog import models
 from django.db.models import Count, F
+from django.contrib.auth.decorators import login_required
+import os
+from BBS import settings
+from bs4 import BeautifulSoup
 
 
 # Create your views here.
@@ -249,7 +253,7 @@ def comment(request):
     content = request.POST.get("content")
     pid = request.POST.get('pid')
 
-    print('article_id:',article_id,'content:',content,'pid:',pid,)
+    print('article_id:', article_id, 'content:', content, 'pid:', pid, )
 
     user_id = request.user.pk
 
@@ -274,3 +278,90 @@ def comment(request):
     response["content"] = content
 
     return JsonResponse(response)
+
+
+@login_required
+def backend(request):
+    '''
+    个人管理后台:添加一个登陆验证装饰器，后台管理个人的相关文章，编辑及删除
+    :param request:
+    :return:
+    '''
+    if request.method == 'POST':
+        print(request)
+
+        response = {'nid': None, 'command': None}
+
+        nid = request.POST.get('nid')
+        command = request.POST.get('command')
+        print(nid, command)
+        print(type(nid))
+
+        nid = int(nid)
+
+        response['nid'] = nid
+        response['command'] = command
+
+        if command == 'edit':
+            pass
+        else:
+            print(nid,'号文章删除了')
+            models.Article.objects.filter(nid=nid).delete()
+
+        response['nid'] = nid
+        response['command'] = command
+
+        return JsonResponse(response)
+
+    article_list = models.Article.objects.filter(user=request.user)
+
+    return render(request, 'backend/backend.html', locals())
+
+
+@login_required
+def backend_add_article(request):
+    """
+    后台管理的添加书籍视图函数
+    :param request:
+    :return:
+    """
+    if request.method == "POST":
+        title = request.POST.get("title")
+        content = request.POST.get("content")
+
+        # 防止xss攻击,过滤script标签
+        soup = BeautifulSoup(content, "html.parser")
+        for tag in soup.find_all():
+
+            print(tag.name)
+            if tag.name == "script":
+                tag.decompose()
+
+        # 构建摘要数据,获取标签字符串的文本前150个符号
+
+        desc = soup.text[0:150] + "..."
+        # 生成记录
+        models.Article.objects.create(title=title, desc=desc, content=str(soup), user=request.user)
+        return redirect("/backend/")  # 重定向 视图
+
+    return render(request, "backend/backend_add_article.html")
+
+
+def upload(request):
+    """
+    编辑器上传文件接受视图函数
+    :param request:
+    :return:
+    """
+    print(request.FILES)
+    img_obj = request.FILES.get("upload_img")
+    print(img_obj.name)
+
+    # 文件配置路径
+    path = os.path.join(settings.MEDIA_ROOT, "add_article_img", img_obj.name)
+
+    with open(path, "wb") as f:
+        for line in img_obj:
+            f.write(line)
+
+    return HttpResponse("ok")

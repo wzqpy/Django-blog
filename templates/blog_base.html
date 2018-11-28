@@ -60,14 +60,16 @@
 <body>
 
 <div class="header">
+    {% block top-content %}
     <div class="content">
         <p class="title">
             <span class="top-title">{{ blog.title }}的博客</span>
             <a href="/index/" class="backend pull-right" style="font-size: 14px;margin-top: 35px">返回首页</a>
-            <a href="/cn_backend/" class="backend pull-right">个人管理</a>
+            <a href="/backend/" class="backend pull-right">个人管理</a>
 
         </p>
     </div>
+    {% endblock %}
 </div>
 
 <div class="col-md-4">

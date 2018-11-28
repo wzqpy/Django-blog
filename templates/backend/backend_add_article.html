@@ -1,0 +1,76 @@
+{% extends 'backend/backend_base.html' %}
+
+
+{% block left-content %}
+
+
+    <div class="panel panel-info">
+        <div class="panel-heading">功能</div>
+        <div class="panel-body">
+            <p><a href="">添加文章</a></p>
+            <p><a href="/backend/">查看所有文章</a></p>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block right-content %}
+
+
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="add_article">
+            <p>添加文章</p>
+
+            <div >
+                <div >
+                    <label for="">标题</label>
+                    <div>
+                        <input type="text" name="title" style="width: 400px">
+                    </div>
+                </div>
+
+                <div class="content form-group" style="margin-top: 40px">
+                    <label for="">内容(Kindeditor编辑器，不支持拖放/粘贴上传图片) </label>
+                    <div>
+                        <textarea name="content" id="article_content" cols="30" rows="10"></textarea>
+                    </div>
+                </div>
+
+                <input type="submit" class="btn btn-default pull-right">
+
+            </div>
+
+        </div>
+    </form>
+    <script src="/static/js/jquery-3.2.1.min.js"></script>
+    <script charset="utf-8" src="/static/blog/kindeditor/kindeditor-all.js"></script>
+
+    <script>
+
+        KindEditor.ready(function (K) {
+            // id值唯一
+            window.editor = K.create('#article_content', {
+                width: "600",
+                height: "400",
+                resizeType: 0,
+                //上传 文件视图
+                uploadJson: "/upload/",
+                extraFileUploadParams: {
+                    csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val()
+                },
+                // 文件传输名字
+                filePostName: "upload_img"
+
+
+            });
+        });
+    </script>
+
+
+
+
+
+{% endblock %}

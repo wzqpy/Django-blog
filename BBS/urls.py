@@ -27,6 +27,8 @@ urlpatterns = [
     path('logout/', views.logout),
     path('artlike/', views.artlike),
     path('comment/', views.comment),
+    path('backend/', views.backend),
+    path('backend_add/', views.backend_add_article),
 
     # media配置:
     re_path(r"media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
